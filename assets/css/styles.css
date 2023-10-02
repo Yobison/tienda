@@ -22,6 +22,26 @@ a:hover{
     color: #555;
 }
 
+.alert_green{
+    color: green;
+}
+
+.alert_red{
+    color: red;
+}
+
+table{
+    text-align: center;
+    width: 100%;
+    border: 1px solid #555;
+}
+
+td{
+    border-top: 1px solid #555;
+    padding: 2px;
+}
+
+
 /*CONTAINER*/
 
 #container{
@@ -161,13 +181,16 @@ a:hover{
 
 /*FORMULARIO*/
 
-
+.form-container{
+    width: 50%;
+}
 
 label,
 input[type="text"],
 input[type="password"],
 input[type="email"],
-select{
+input[type="number"],
+select, textarea{
     display: block;
     width: 95%;
     margin-top: 2px;
@@ -178,7 +201,8 @@ select{
 input[type="text"],
 input[type="password"],
 input[type="email"],
-select{
+input[type="number"],
+select, textarea{
     border: 1px solid #c9c9c9;
     box-shadow: 0px 0px 2px #ccc inset;
     background: white;
@@ -213,6 +237,12 @@ button, .button{
     background: #33ae3d;
     color: white !important;
     text-decoration: none;
+}
+
+.button-small{
+    text-align: center;
+    width: 120px;
+    margin-bottom: 20px;
 }
 
 label,

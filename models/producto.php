@@ -52,23 +52,23 @@ class Producto{
     }
 
     function setNombre($nombre){
-        $this->nombre = $nombre;
+        $this->nombre = $this->db->real_escape_string($nombre);
     }
 
     function setDescripcion($descripcion){
-        $this->descripcion = $descripcion;
+        $this->descripcion = $this->db->real_escape_string($descripcion);
     }
 
     function setPrecio($precio){
-        $this->precio = $precio;
+        $this->precio = $this->db->real_escape_string($precio);
     }
 
     function setStock($stock){
-        $this->stock = $stock;
+        $this->stock = $this->db->real_escape_string($stock);
     }
 
     function setOferta($oferta){
-        $this->oferta = $oferta;
+        $this->oferta = $this->db->real_escape_string($oferta);
     }
 
     function setFecha($fecha){
@@ -84,5 +84,72 @@ class Producto{
         return $productos;
     }
 
+    public function getOne(){
+        $producto= $this->db->query("SELECT *  FROM productos WHERE id={$this->getId()}");
+        return $producto->fetch_object();
+    }
+
+    public function save(){
+      $sql = "INSERT INTO productos VALUES(NULL, '{$this->getCategoria_id()}', '{$this->getNombre()}', '{$this->getDescripcion()}', '{$this->getPrecio()}', '{$this->getStock()}', null, CURDATE(), '{$this->getImagen()}');";
+      $save = $this->db->query($sql);
+
+      $result = false;
+      if($save){
+          $result = true;
+      }
+      return $result;
+    }
+
+    public function edit(){
+      /*$sql = "UPDATE productos SET nombre={$this->getNombre()}, descripcion={$this->getDescripcion()}, precio={$this->getPrecio()}, stock={$this->getStock()},categoria_id={$this->getCategoria_id()} ";
+      
+      if($this->getImagen() != null){
+        $sql.= ", imagen='{$this->getImagen()}'";
+      }
+      
+      $sql.= " WHERE id={$this->id};";
+
+      $save = $this->db->query($sql);
+
+      $result = false;
+      if($save){
+          $result = true;
+      }
+      return $result;*/
+
+      $sql = "UPDATE productos SET nombre=?, descripcion=?, precio=?, stock=?, categoria_id=?";
+      
+      $params = [$this->getNombre(), $this->getDescripcion(), $this->getPrecio(), $this->getStock(), $this->getCategoria_id()];
+
+      if($this->getImagen() != null){
+          $sql .= ", imagen=?";
+          $params[] = $this->getImagen();
+      }
+      
+      $sql .= " WHERE id=?";
+      $params[] = $this->id;
+
+      $stmt = $this->db->prepare($sql);
+
+      if ($stmt) {
+          $result = $stmt->execute($params);
+          return $result !== false;
+      } else {
+          return false;
+      }
+
+
+    }
+
+    public function delete(){
+      $sql = "DELETE FROM productos WHERE id={$this->id}";
+      $delete = $this->db->query($sql);
+
+      $result = false;
+      if($delete){
+        $result = true;
+      }
+    return $result;
+    }
 
 }

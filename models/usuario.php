@@ -73,34 +73,77 @@ class Usuario{
     }
 
     public function save(){
-        $sql = "INSERT INTO usuarios VALUES(NULL, '{$this->getNombre()}', '{$this->getApellidos()}', '{$this->getEmail()}', '{$this->getPassword()}', 'user', null);";
+        /*$sql = "INSERT INTO usuarios VALUES(NULL, '{$this->getNombre()}', '{$this->getApellidos()}', '{$this->getEmail()}', '{$this->getPassword()}', 'user', null);";
         $save = $this->db->query($sql);
 
         $result = false;
         if($save){
             $result = true;
         }
-        return $result;
+        return $result;*/
+        $sql = "INSERT INTO usuarios (id, nombre, apellidos, email, password, rol, imagen) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
+
+        if ($stmt) {
+          // Vincular los valores a los marcadores de posición
+          $id = null;
+          $nombre = $this->getNombre();
+          $apellidos = $this->getApellidos();
+          $email = $this->getEmail();
+          $password = $this->getPassword();
+          $rol = 'user';
+          $imagen = null;
+          
+          $stmt->bind_param("sssssss", $id, $nombre, $apellidos, $email, $password, $rol, $imagen);
+
+          // Ejecutar la consulta
+          $result = $stmt->execute();
+
+          // Comprobar si la inserción fue exitosa
+        if ($result) {
+            return true;
+        } else {
+            // Manejar errores aquí, por ejemplo, registrarlos o devolver un mensaje de error.
+            return false;
+        }
+      } else {
+        // Manejar errores de preparación de la consulta aquí
+        echo "Error al preparar la consulta.";
+        return false;
+      }
     }
 
     public function login(){
-        $result = false;
-        $email = $this->email;
-        $password = $this->password;
-        //Comprobar si existe el usuario
-        $sql = "SELECT * FROM usuarios WHERE email = '$email'";
-        $login = $this->db->query($sql);
+      $result = false;
+      $email = $this->email;
+      $password = $this->password;
+      //Comprobar si existe el usuario
+      /*$sql = "SELECT * FROM usuarios WHERE email = '$email'";
+      $login = $this->db->query($sql);*/
+      $sql = "SELECT * FROM usuarios WHERE email = ?";
+      $stmt = $this->db->prepare($sql);
+
+      if ($stmt) {
+        // Vincular el valor de $email al marcador de posición
+        $stmt->bind_param("s", $email);
+
+        // Ejecutar la consulta
+        $stmt->execute();
+
+        // Obtener el resultado de la consulta
+        $login = $stmt->get_result();
 
         if($login && $login->num_rows == 1){
-            $usuario = $login->fetch_object();
+          $usuario = $login->fetch_object();
 
-            //Verificar la contraseña
-            $verify = password_verify($password, $usuario->password);
-            $result = false;
-            if($verify){
-                $result = $usuario;
-            }
+          //Verificar la contraseña
+          $verify = password_verify($password, $usuario->password);
+          $result = false;
+          if($verify){
+            $result = $usuario;
+          }
         }
-        return $result;
+      }
+      return $result;
     }
 }

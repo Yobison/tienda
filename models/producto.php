@@ -80,25 +80,87 @@ class Producto{
     }
 
     public function getAll(){
-        $productos= $this->db->query("SELECT *  FROM productos ORDER BY id DESC");
-        return $productos;
+        /*$productos= $this->db->query("SELECT *  FROM productos ORDER BY id DESC");
+        return $productos;*/
+        // Preparar una consulta SQL parametrizada
+        $sql = "SELECT * FROM productos ORDER BY id DESC";
+        $stmt = $this->db->prepare($sql);
+
+        if ($stmt) {
+          // Ejecutar la consulta
+          $stmt->execute();
+
+          // Obtener el resultado de la consulta
+          $productos = $stmt->get_result();
+
+          return $productos;
+        } else {
+          // Manejar errores de preparación de la consulta aquí
+          echo "Error al preparar la consulta.";
+          return null;
+        }
     }
 
     public function getOne(){
-        $producto= $this->db->query("SELECT *  FROM productos WHERE id={$this->getId()}");
-        return $producto->fetch_object();
+        /*$producto= $this->db->query("SELECT *  FROM productos WHERE id={$this->getId()}");
+        return $producto->fetch_object();*/
+        // Preparar una consulta SQL parametrizada
+        $sql = "SELECT * FROM productos WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+
+        if ($stmt) {
+          
+          $stmt->bind_param("i", $this->getId()); 
+
+          // Ejecutar la consulta
+          $stmt->execute();
+
+          // Obtener el resultado de la consulta
+          $producto = $stmt->get_result()->fetch_object();
+
+          return $producto;
+        } else {
+          // Manejar errores de preparación de la consulta aquí
+          echo "Error al preparar la consulta.";
+          return null;
+        }
     }
 
     public function save(){
-      $sql = "INSERT INTO productos VALUES(NULL, '{$this->getCategoria_id()}', '{$this->getNombre()}', '{$this->getDescripcion()}', '{$this->getPrecio()}', '{$this->getStock()}', null, CURDATE(), '{$this->getImagen()}');";
+      /*$sql = "INSERT INTO productos VALUES(NULL, '{$this->getCategoria_id()}', '{$this->getNombre()}', '{$this->getDescripcion()}', '{$this->getPrecio()}', '{$this->getStock()}', null, CURDATE(), '{$this->getImagen()}');";
       $save = $this->db->query($sql);
 
       $result = false;
       if($save){
           $result = true;
       }
-      return $result;
+      return $result;*/
+    $categoria_id = $this->getCategoria_id();
+    $nombre = $this->getNombre();
+    $descripcion = $this->getDescripcion();
+    $precio = $this->getPrecio();
+    $stock = $this->getStock();
+    $imagen = $this->getImagen();
+
+    $sql = "INSERT INTO productos VALUES(NULL, ?, ?, ?, ?, ?, null, CURDATE(), ?)";
+    $stmt = $this->db->prepare($sql);
+
+    if ($stmt) {
+        $stmt->bind_param("isssds", $categoria_id, $nombre, $descripcion, $precio, $stock, $imagen);
+
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            // Manejar errores aquí, por ejemplo, registrarlos o devolver un mensaje de error.
+            return false;
+        }
+    } else {
+        // Manejar errores de preparación de la consulta aquí.
+        return false;
     }
+  }
+
+
 
     public function edit(){
       /*$sql = "UPDATE productos SET nombre={$this->getNombre()}, descripcion={$this->getDescripcion()}, precio={$this->getPrecio()}, stock={$this->getStock()},categoria_id={$this->getCategoria_id()} ";
@@ -142,14 +204,21 @@ class Producto{
     }
 
     public function delete(){
-      $sql = "DELETE FROM productos WHERE id={$this->id}";
-      $delete = $this->db->query($sql);
-
-      $result = false;
-      if($delete){
-        $result = true;
+      /*$sql = "DELETE FROM productos WHERE id={$this->id}";
+      $delete = $this->db->query($sql);*/
+      $sql = "DELETE FROM productos WHERE id = ?";
+    
+      $stmt = $this->db->prepare($sql);
+      if ($stmt) {
+        $stmt->bind_param("i", $this->id);
+        if ($stmt->execute()) {
+            // La eliminación se realizó con éxito
+            return true;
+        }
       }
-    return $result;
+    
+      // Si llegamos aquí, la eliminación falló
+      return false;
     }
 
 }

@@ -26,12 +26,19 @@ class Categoria{
     }
 
     public function getAll(){
-        $categorias = $this->db->query("SELECT * FROM categorias ORDER BY id DESC;");
+        /*$categorias = $this->db->query("SELECT * FROM categorias ORDER BY id DESC;");
+        return $categorias;*/
+
+        $stmt = $this->db->prepare("SELECT * FROM categorias ORDER BY id DESC");
+        $stmt->execute();
+        $categorias = $stmt->get_result();
         return $categorias;
     }
 
+
+
     public function save(){
-        $sql = "INSERT INTO categorias VALUES(NULL, '{$this->getNombre()}');";
+        /*$sql = "INSERT INTO categorias VALUES(NULL, '{$this->getNombre()}');";
         $save = $this->db->query($sql);
 
         $result = false;
@@ -39,8 +46,24 @@ class Categoria{
             $result = true;
         }
         return $result;
+    }*/
+    $nombre = $this->getNombre();
+    
+    // Utilizar una consulta preparada
+    $stmt = $this->db->prepare("INSERT INTO categorias VALUES(NULL, ?)");
+    
+      if ($stmt) {
+          $stmt->bind_param("s", $nombre); // "s" indica que se espera una cadena (string)
+          if ($stmt->execute()) {
+              return true;
+          } else {
+              // Manejar errores aquí, por ejemplo, registrarlos o devolver un mensaje de error.
+              return false;
+          }
+      } else {
+          // Manejar errores de preparación de la consulta aquí.
+          return false;
+      }
     }
-
-}
-
+  }
 ?>

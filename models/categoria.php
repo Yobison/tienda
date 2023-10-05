@@ -32,10 +32,22 @@ class Categoria{
         $stmt = $this->db->prepare("SELECT * FROM categorias ORDER BY id DESC");
         $stmt->execute();
         $categorias = $stmt->get_result();
+        $stmt->close();
         return $categorias;
     }
 
-
+    public function getOne(){
+        /*$categoria = $this->db->query("SELECT * FROM categorias WHERE id ={$this->getId()}");
+        return $categoria->fetch_object();*/
+        $id = $this->getId();
+        $stmt = $this->db->prepare("SELECT * FROM categorias WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $categoria = $result->fetch_object();
+        $stmt->close();
+        return $categoria;
+    }
 
     public function save(){
         /*$sql = "INSERT INTO categorias VALUES(NULL, '{$this->getNombre()}');";

@@ -101,6 +101,33 @@ class Producto{
         }
     }
 
+    public function getAllCategory(){
+      /*$sql = ("SELECT p.*, c.nombre  FROM productos p "
+            . "INNER JOIN categorias c ON c.id = p.categoria_id "
+            . "WHERE p.categoria_id = {$this->getCategoria_id()} "
+            . "ORDER BY id DESC");
+      $productos= $this->db->query($sql);
+      return $productos;*/
+      $categoria_id = $this->getCategoria_id();
+      $sql = "SELECT p.*, c.nombre AS 'catnombre' FROM productos p "
+        . "INNER JOIN categorias c ON c.id = p.categoria_id "
+        . "WHERE p.categoria_id = ? "
+        . "ORDER BY p.id DESC";
+
+      $stmt = $this->db->prepare($sql);
+      $stmt->bind_param("i", $categoria_id);
+      $stmt->execute();
+      $productos = $stmt->get_result();
+      $stmt->close();
+      return $productos;
+    }
+
+
+    public function getRandom($limit){
+      $productos = $this->db->query("SELECT * FROM productos ORDER BY RAND() LIMIT $limit");
+      return $productos;
+    }
+
     public function getOne(){
         /*$producto= $this->db->query("SELECT *  FROM productos WHERE id={$this->getId()}");
         return $producto->fetch_object();*/
@@ -110,7 +137,8 @@ class Producto{
 
         if ($stmt) {
           
-          $stmt->bind_param("i", $this->getId()); 
+          $id = $this->getId();
+          $stmt->bind_param("i", $id);
 
           // Ejecutar la consulta
           $stmt->execute();

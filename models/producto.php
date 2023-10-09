@@ -227,8 +227,6 @@ class Producto{
       } else {
           return false;
       }
-
-
     }
 
     public function delete(){

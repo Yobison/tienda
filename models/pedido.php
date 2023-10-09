@@ -305,4 +305,36 @@ class Pedido{
       return false;
     }
 
+    public function edit(){
+      /*$sql = "UPDATE pedidos SET estado={$this->getEstado()}";
+      
+      $sql.= " WHERE id={$this->getId()};";
+
+      $save = $this->db->query($sql);
+
+      $result = false;
+      if($save){
+          $result = true;
+      }
+      return $result;*/
+
+      $sql = "UPDATE pedidos SET estado=? WHERE id=?";
+      
+      $stmt = $this->db->prepare($sql);
+
+      if ($stmt){
+        $estado = $this->getEstado();
+        $id = $this->getId();
+
+        $stmt->bind_param("si", $estado, $id);
+        $result = $stmt->execute();
+
+        if ($result !== false) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+
 }

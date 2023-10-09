@@ -46,4 +46,18 @@ class Utils{
       }
       return $stats;
     }
+
+    public static function showStatus($status){
+      $value = 'Pendiente';
+      if($status == 'confirm'){
+        $value = 'Pendiente';
+      }else if($status == 'preparation'){
+        $value = 'En preparación';
+      }else if($status == 'ready'){
+        $value = 'Preparado para enviar';
+      }else if($status == 'sended'){
+        $value = 'Enviado';
+      }
+    return $value;
+    }
 }
